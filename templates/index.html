@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1>
+        Hello,
+        {% if name %}
+            {{ name }}
+        {% else %}
+            Stranger
+        {% endif %}
+        !
+    </h1>
+
+</div>
+
+
+<form method="POST" class="formulario">
+
+    {{ form.hidden_tag() }}
+
+
+    <div class="campo">
+
+        {{ form.name.label }}
+
+        {{ form.name(class="input") }}
+
+        {% for error in form.name.errors %}
+
+            <span class="erro">
+                {{ error }}
+            </span>
+
+        {% endfor %}
+
+    </div>
+
+
+    {{ form.submit(class="submit") }}
+
+</form>
+
+{% endblock %}
