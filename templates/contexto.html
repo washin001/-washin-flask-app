@@ -1,14 +1,36 @@
 {% extends "base.html" %}
 
+
+{% block title %}
+Contexto
+{% endblock %}
+
+
 {% block content %}
 
-<h1>Contexto da requisição</h1>
+<div class="pagina">
 
-<hr>
+    <div class="card">
 
-<p>
-    Esta página faz parte da aplicação Flask
-    desenvolvida para a Semana 05.
-</p>
+        <h1>
+            Contexto
+        </h1>
+
+
+        <p>
+            Esta aplicação foi desenvolvida utilizando
+            o framework Flask e hospedada na plataforma
+            PythonAnywhere.
+        </p>
+
+
+        <p>
+            O projeto faz parte das atividades da disciplina
+            e utiliza páginas HTML, CSS e rotas Flask.
+        </p>
+
+    </div>
+
+</div>
 
 {% endblock %}

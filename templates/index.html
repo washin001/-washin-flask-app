@@ -1,46 +1,165 @@
 {% extends "base.html" %}
 
+
+{% block title %}
+Home
+{% endblock %}
+
+
 {% block content %}
 
-<div class="page-header">
+<div class="pagina-home">
 
     <h1>
-        Hello,
-        {% if name %}
-            {{ name }}
-        {% else %}
-            Stranger
-        {% endif %}
-        !
+        Seja bem-vindo à aplicação Flask!
     </h1>
 
+
+    <section class="card">
+
+        <h2>
+            Informe seus dados
+        </h2>
+
+
+        <div class="info-usuario">
+
+            <p>
+                Olá, {{ nome if nome else 'Estranho' }} {{ sobrenome }}!
+            </p>
+
+            <p>
+                A sua instituição de ensino é {{ instituicao }}
+            </p>
+
+            <p>
+                Está cursando a disciplina de {{ disciplina if disciplina else '' }}
+            </p>
+
+            <p class="info-tecnica">
+                O IP do computador remoto é: {{ ip }}
+            </p>
+
+            <p class="info-tecnica">
+                O host da aplicação é: {{ host }}
+            </p>
+
+        </div>
+
+
+        <form method="POST" class="formulario">
+
+            <div class="campo">
+
+                <label for="nome">
+                    Informe o seu nome
+                </label>
+
+                <input
+                    type="text"
+                    id="nome"
+                    name="nome"
+                    value="{{ nome if nome else '' }}"
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="sobrenome">
+                    Informe o seu sobrenome:
+                </label>
+
+                <input
+                    type="text"
+                    id="sobrenome"
+                    name="sobrenome"
+                    value="{{ sobrenome if sobrenome else '' }}"
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="instituicao">
+                    Informe a sua instituição de ensino:
+                </label>
+
+                <input
+                    type="text"
+                    id="instituicao"
+                    name="instituicao"
+                    value="{{ instituicao if instituicao else '' }}"
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="disciplina">
+                    Informe a sua disciplina:
+                </label>
+
+                <select
+                    id="disciplina"
+                    name="disciplina"
+                >
+
+                    <option value="">
+                        Selecione uma disciplina
+                    </option>
+
+                    <option value="Banco de Dados"
+                        {% if disciplina == 'Banco de Dados' %}selected{% endif %}>
+                        Banco de Dados
+                    </option>
+
+                    <option value="Programação"
+                        {% if disciplina == 'Programação' %}selected{% endif %}>
+                        Programação
+                    </option>
+
+                    <option value="Modelagem de Sistemas"
+                        {% if disciplina == 'Modelagem de Sistemas' %}selected{% endif %}>
+                        Modelagem de Sistemas
+                    </option>
+
+                    <option value="Desenvolvimento Web"
+                        {% if disciplina == 'Desenvolvimento Web' %}selected{% endif %}>
+                        Desenvolvimento Web
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="campo botao-area">
+
+                <button type="submit">
+                    Enviar
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <p class="data-hora">
+            The local date and time is {{ horario }}.
+        </p>
+
+        {% if mensagem_tempo %}
+        <p class="data-hora">
+            That was {{ mensagem_tempo }} ago.
+        </p>
+        {% endif %}
+
+    </section>
+
 </div>
-
-
-<form method="POST" class="formulario">
-
-    {{ form.hidden_tag() }}
-
-
-    <div class="campo">
-
-        {{ form.name.label }}
-
-        {{ form.name(class="input") }}
-
-        {% for error in form.name.errors %}
-
-            <span class="erro">
-                {{ error }}
-            </span>
-
-        {% endfor %}
-
-    </div>
-
-
-    {{ form.submit(class="submit") }}
-
-</form>
 
 {% endblock %}

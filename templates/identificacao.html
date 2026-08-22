@@ -1,21 +1,43 @@
 {% extends "base.html" %}
 
+
+{% block title %}
+Identificação
+{% endblock %}
+
+
 {% block content %}
 
-<h1>Identificação</h1>
+<div class="pagina">
 
-<hr>
+    <div class="card">
 
-<p>
-    <strong>Nome:</strong> {{ nome }}
-</p>
+        <h1>
+            Identificação
+        </h1>
 
-<p>
-    <strong>Prontuário:</strong> {{ prontuario }}
-</p>
 
-<p>
-    <strong>Professor:</strong> {{ professor }}
-</p>
+        <div class="informacoes">
+
+            <p>
+                <strong>Nome:</strong>
+                Washington
+            </p>
+
+            <p>
+                <strong>Curso:</strong>
+                Análise de Sistemas
+            </p>
+
+            <p>
+                <strong>Instituição:</strong>
+                IFSP - Campus Pirituba
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock %}

@@ -5,70 +5,99 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <title>Flasky</title>
+    <title>
+        {% block title %}Aplicação Flask{% endblock %}
+    </title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- ✅ CORRIGIDO: agora aponta para a pasta css/ -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 
 </head>
 
+
 <body>
 
-    <nav class="navbar">
+    <header class="navbar">
 
-        <div class="navbar-content">
+        <div class="navbar-container">
 
-            <a class="brand" href="{{ url_for('index') }}">
-                Flasky
-            </a>
+            <div class="logo">
+                Aplicação Flask
+            </div>
 
-            <div class="links">
 
-                <a href="{{ url_for('index') }}">
+            <nav class="menu">
+
+                <a
+                    href="{{ url_for('home') }}"
+                    class="{% if request.endpoint == 'home' %}ativo{% endif %}"
+                >
                     Home
                 </a>
 
-                <a href="{{ url_for('identificacao') }}">
+                <a
+                    href="{{ url_for('login') }}"
+                    class="{% if request.endpoint == 'login' %}ativo{% endif %}"
+                >
+                    Login
+                </a>
+
+                <a
+                    href="{{ url_for('identificacao') }}"
+                    class="{% if request.endpoint == 'identificacao' %}ativo{% endif %}"
+                >
                     Identificação
                 </a>
 
-                <a href="{{ url_for('contexto_requisicao') }}">
-                    Contexto da requisição
+                <a
+                    href="{{ url_for('contexto') }}"
+                    class="{% if request.endpoint == 'contexto' %}ativo{% endif %}"
+                >
+                    Contexto
                 </a>
 
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <main class="conteudo">
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+
+    <footer>
+
+        <div class="footer-container">
+
+            <div>
+                <strong>Última atualização</strong>
+
+                <br>
+
+                {{ horario if horario else '' }}
+
+            </div>
+
+
+            <div>
+                Washington - IFSP Pirituba
             </div>
 
         </div>
 
-    </nav>
-
-
-    <main class="container">
-
-        {% with messages = get_flashed_messages() %}
-
-            {% if messages %}
-
-                {% for message in messages %}
-
-                    <div class="alert">
-                        {{ message }}
-                    </div>
-
-                {% endfor %}
-
-            {% endif %}
-
-        {% endwith %}
-
-
-        {% block content %}
-
-        {% endblock %}
-
-    </main>
+    </footer>
 
 </body>
 
