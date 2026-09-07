@@ -1,104 +1,101 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+{% extends "bootstrap/base.html" %}
 
-<head>
+{% block title %}Flasky{% endblock %}
 
-    <meta charset="UTF-8">
+{% block head %}
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+{{ super() }}
 
-    <title>
-        {% block title %}Aplicação Flask{% endblock %}
-    </title>
+<link rel="shortcut icon"
+      href="{{ url_for('static', filename='favicon.ico') }}"
+      type="image/x-icon">
 
-    <!-- ✅ CORRIGIDO: agora aponta para a pasta css/ -->
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
+<link rel="icon"
+      href="{{ url_for('static', filename='favicon.ico') }}"
+      type="image/x-icon">
 
-</head>
+{% endblock %}
 
 
-<body>
+{% block navbar %}
 
-    <header class="navbar">
+<div class="navbar navbar-inverse" role="navigation">
 
-        <div class="navbar-container">
+    <div class="container">
 
-            <div class="logo">
-                Aplicação Flask
-            </div>
+        <div class="navbar-header">
 
+            <button type="button"
+                    class="navbar-toggle"
+                    data-toggle="collapse"
+                    data-target=".navbar-collapse">
 
-            <nav class="menu">
+                <span class="sr-only">Toggle navigation</span>
 
-                <a
-                    href="{{ url_for('home') }}"
-                    class="{% if request.endpoint == 'home' %}ativo{% endif %}"
-                >
-                    Home
-                </a>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
 
-                <a
-                    href="{{ url_for('login') }}"
-                    class="{% if request.endpoint == 'login' %}ativo{% endif %}"
-                >
-                    Login
-                </a>
+            </button>
 
-                <a
-                    href="{{ url_for('identificacao') }}"
-                    class="{% if request.endpoint == 'identificacao' %}ativo{% endif %}"
-                >
-                    Identificação
-                </a>
-
-                <a
-                    href="{{ url_for('contexto') }}"
-                    class="{% if request.endpoint == 'contexto' %}ativo{% endif %}"
-                >
-                    Contexto
-                </a>
-
-            </nav>
+            <a class="navbar-brand" href="/">
+                Flasky
+            </a>
 
         </div>
 
-    </header>
 
+        <div class="navbar-collapse collapse">
 
-    <main class="conteudo">
+            <ul class="nav navbar-nav">
 
-        {% block content %}
-        {% endblock %}
+                <li>
+                    <a href="/">Home</a>
+                </li>
 
-    </main>
-
-
-    <footer>
-
-        <div class="footer-container">
-
-            <div>
-                <strong>Última atualização</strong>
-
-                <br>
-
-                {{ horario if horario else '' }}
-
-            </div>
-
-
-            <div>
-                Washington - IFSP Pirituba
-            </div>
+            </ul>
 
         </div>
 
-    </footer>
+    </div>
 
-</body>
+</div>
 
-</html>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+
+    {% for message in get_flashed_messages() %}
+
+        <div class="alert alert-warning">
+
+            <button type="button"
+                    class="close"
+                    data-dismiss="alert">
+                &times;
+            </button>
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+
+
+    {% block page_content %}{% endblock %}
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+{{ super() }}
+
+{{ moment.include_moment() }}
+
+{% endblock %}
