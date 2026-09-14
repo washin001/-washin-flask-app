@@ -1,13 +1,16 @@
 import os
+
 from flask import Flask, render_template, session, redirect, url_for
 
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SelectField, SubmitField
 from wtforms.validators import DataRequired
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -20,6 +23,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = \
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 
@@ -31,7 +35,6 @@ class Role(db.Model):
     __tablename__ = 'roles'
 
     id = db.Column(db.Integer, primary_key=True)
-
     name = db.Column(db.String(64), unique=True)
 
     users = db.relationship(
@@ -48,7 +51,6 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-
     username = db.Column(
         db.String(64),
         unique=True,
@@ -71,12 +73,17 @@ class NameForm(FlaskForm):
         validators=[DataRequired()]
     )
 
+    role = SelectField(
+        'Role?',
+        coerce=int,
+        validators=[DataRequired()]
+    )
+
     submit = SubmitField('Submit')
 
 
 @app.shell_context_processor
 def make_shell_context():
-
     return dict(
         db=db,
         User=User,
@@ -86,13 +93,11 @@ def make_shell_context():
 
 @app.errorhandler(404)
 def page_not_found(e):
-
     return render_template('404.html'), 404
 
 
 @app.errorhandler(500)
 def internal_server_error(e):
-
     return render_template('500.html'), 500
 
 
@@ -101,40 +106,42 @@ def index():
 
     form = NameForm()
 
+    roles = Role.query.order_by(Role.id).all()
+
+    form.role.choices = [
+        (role.id, role.name)
+        for role in roles
+    ]
+
     if form.validate_on_submit():
 
         user = User.query.filter_by(
             username=form.name.data
         ).first()
 
+        selected_role = db.session.get(
+            Role,
+            form.role.data
+        )
+
         if user is None:
-
-            user_role = Role.query.filter_by(
-                name='User'
-            ).first()
-
-            if user_role is None:
-
-                user_role = Role(name='User')
-
-                db.session.add(user_role)
-
-                db.session.commit()
 
             user = User(
                 username=form.name.data,
-                role=user_role
+                role=selected_role
             )
 
             db.session.add(user)
-
-            db.session.commit()
 
             session['known'] = False
 
         else:
 
+            user.role = selected_role
+
             session['known'] = True
+
+        db.session.commit()
 
         session['name'] = form.name.data
 
@@ -142,10 +149,28 @@ def index():
 
     users = User.query.order_by(User.id).all()
 
+    users_count = User.query.count()
+
+    roles_count = Role.query.count()
+
+    grouped_users = {}
+
+    for role in roles:
+
+        grouped_users[role.name] = (
+            role.users
+            .order_by(User.username)
+            .all()
+        )
+
     return render_template(
         'index.html',
         form=form,
         name=session.get('name'),
         known=session.get('known', False),
-        users=users
+        users=users,
+        roles=roles,
+        grouped_users=grouped_users,
+        users_count=users_count,
+        roles_count=roles_count
     )

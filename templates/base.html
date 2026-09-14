@@ -1,18 +1,134 @@
 {% extends "bootstrap/base.html" %}
 
-{% block title %}Flasky{% endblock %}
+{% block title %}Avaliação contínua: Aula 060.C{% endblock %}
+
 
 {% block head %}
 
 {{ super() }}
 
-<link rel="shortcut icon"
-      href="{{ url_for('static', filename='favicon.ico') }}"
-      type="image/x-icon">
+<style>
 
-<link rel="icon"
-      href="{{ url_for('static', filename='favicon.ico') }}"
-      type="image/x-icon">
+    html,
+    body {
+        background-color: #181a1b;
+        color: #d0d0d0;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .navbar {
+        background-color: #181a1b !important;
+        border-color: #555 !important;
+        border-radius: 0;
+        min-height: 50px;
+        margin-bottom: 30px;
+    }
+
+    .navbar-brand {
+        color: #b8b8b8 !important;
+        font-size: 13px;
+        padding-left: 0;
+    }
+
+    .navbar-nav > li > a {
+        color: #b8b8b8 !important;
+        font-size: 11px;
+    }
+
+    .navbar-nav > li > a:hover,
+    .navbar-brand:hover {
+        color: #ffffff !important;
+        background-color: transparent !important;
+    }
+
+    .container {
+        max-width: 800px;
+    }
+
+    .page-header {
+        border-bottom: 1px solid #444;
+        margin-top: 20px;
+    }
+
+    h1,
+    h2,
+    h3 {
+        color: #c8c8c8;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    h3 {
+        font-size: 14px;
+    }
+
+    p,
+    label,
+    th,
+    td,
+    li {
+        color: #c8c8c8;
+    }
+
+    .form-control {
+        background-color: #181a1b;
+        color: #d0d0d0;
+        border: 1px solid #555;
+    }
+
+    .form-control:focus {
+        background-color: #181a1b;
+        color: #ffffff;
+        border-color: #777;
+        box-shadow: none;
+    }
+
+    .btn-default {
+        background-color: #181a1b;
+        color: #d0d0d0;
+        border: 1px solid #555;
+    }
+
+    .btn-default:hover {
+        background-color: #303234;
+        color: #ffffff;
+        border-color: #777;
+    }
+
+    .table {
+        color: #c8c8c8;
+        border-color: #444;
+    }
+
+    .table > thead > tr > th {
+        color: #d0d0d0;
+        border-bottom: 1px solid #444;
+    }
+
+    .table > tbody > tr > td {
+        border-top: 1px solid #444;
+        color: #c8c8c8;
+    }
+
+    .table > tbody > tr:hover {
+        background-color: #202223;
+    }
+
+    ul,
+    ol {
+        color: #c8c8c8;
+    }
+
+</style>
 
 {% endblock %}
 
@@ -25,25 +141,11 @@
 
         <div class="navbar-header">
 
-            <button type="button"
-                    class="navbar-toggle"
-                    data-toggle="collapse"
-                    data-target=".navbar-collapse">
-
-                <span class="sr-only">Toggle navigation</span>
-
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-
-            </button>
-
             <a class="navbar-brand" href="/">
-                Flasky
+                Avaliação contínua: Aula 060.C
             </a>
 
         </div>
-
 
         <div class="navbar-collapse collapse">
 
@@ -68,22 +170,21 @@
 
 <div class="container">
 
-    {% for message in get_flashed_messages() %}
+    {% with messages = get_flashed_messages() %}
 
-        <div class="alert alert-warning">
+        {% if messages %}
 
-            <button type="button"
-                    class="close"
-                    data-dismiss="alert">
-                &times;
-            </button>
+            {% for message in messages %}
 
-            {{ message }}
+                <div class="alert alert-warning">
+                    {{ message }}
+                </div>
 
-        </div>
+            {% endfor %}
 
-    {% endfor %}
+        {% endif %}
 
+    {% endwith %}
 
     {% block page_content %}{% endblock %}
 

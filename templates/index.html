@@ -1,10 +1,6 @@
 {% extends "base.html" %}
 
-{% import "bootstrap/wtf.html" as wtf %}
-
-
-{% block title %}Flasky{% endblock %}
-
+{% block title %}Avaliação contínua: Aula 060.C{% endblock %}
 
 {% block page_content %}
 
@@ -19,21 +15,50 @@
         {% endif %}!
     </h1>
 
-
     {% if not known %}
-
         <p>Prazer em conhecê-lo!</p>
-
     {% else %}
-
         <p>Feliz em vê-lo novamente!</p>
-
     {% endif %}
 
 </div>
 
 
-{{ wtf.quick_form(form) }}
+<form method="POST">
+
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+
+        {{ form.name.label }}
+
+        {{ form.name(
+            class="form-control"
+        ) }}
+
+    </div>
+
+
+    <div class="form-group">
+
+        {{ form.role.label }}
+
+        {{ form.role(
+            class="form-control"
+        ) }}
+
+    </div>
+
+
+    <div class="form-group">
+
+        {{ form.submit(
+            class="btn btn-default"
+        ) }}
+
+    </div>
+
+</form>
 
 
 <br>
@@ -41,17 +66,16 @@
 
 <h2>Relação de usuários cadastrados</h2>
 
+<h4>Quantidade: {{ users_count }}</h4>
+
 
 <table class="table">
 
     <thead>
 
         <tr>
-
             <th>Nome do usuário</th>
-
             <th>Função</th>
-
         </tr>
 
     </thead>
@@ -70,9 +94,66 @@
             <td>
                 {% if user.role %}
                     {{ user.role.name }}
-                {% else %}
-                    User
                 {% endif %}
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+
+<br>
+
+
+<h2>Relação de funções cadastradas</h2>
+
+<h4>Quantidade: {{ roles_count }}</h4>
+
+
+<table class="table">
+
+    <thead>
+
+        <tr>
+            <th>Funções</th>
+            <th>Usuários</th>
+        </tr>
+
+    </thead>
+
+
+    <tbody>
+
+        {% for role in roles %}
+
+        <tr>
+
+            <td>
+                {{ role.name }}
+            </td>
+
+            <td>
+
+                {% if grouped_users[role.name] %}
+
+                    <ol>
+
+                        {% for user in grouped_users[role.name] %}
+
+                        <li>
+                            {{ user.username }}
+                        </li>
+
+                        {% endfor %}
+
+                    </ol>
+
+                {% endif %}
+
             </td>
 
         </tr>
