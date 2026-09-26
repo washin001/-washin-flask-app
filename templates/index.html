@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Avaliação contínua: Aula 060.C{% endblock %}
+{% block title %}
+Flasky
+{% endblock %}
 
 {% block page_content %}
 
 <div class="page-header">
 
     <h1>
-        Olá,
+        Hello,
         {% if name %}
             {{ name }}
         {% else %}
@@ -15,25 +17,27 @@
         {% endif %}!
     </h1>
 
-    {% if not known %}
-        <p>Prazer em conhecê-lo!</p>
-    {% else %}
-        <p>Feliz em vê-lo novamente!</p>
-    {% endif %}
-
 </div>
 
 
-<form method="POST">
+{% if form %}
+
+<form
+    method="POST"
+    class="form"
+    role="form"
+>
 
     {{ form.hidden_tag() }}
+
 
     <div class="form-group">
 
         {{ form.name.label }}
 
         {{ form.name(
-            class="form-control"
+            class="form-control",
+            placeholder="Digite o nome do usuário"
         ) }}
 
     </div>
@@ -52,30 +56,62 @@
 
     <div class="form-group">
 
-        {{ form.submit(
-            class="btn btn-default"
-        ) }}
+        <div class="checkbox">
+
+            <label>
+
+                {{ form.email_admin() }}
+
+                {{ form.email_admin.label.text }}
+
+            </label>
+
+        </div>
 
     </div>
 
+
+    {{ form.submit(
+        class="btn btn-primary"
+    ) }}
+
 </form>
 
-
-<br>
-
-
-<h2>Relação de usuários cadastrados</h2>
-
-<h4>Quantidade: {{ users_count }}</h4>
+{% endif %}
 
 
-<table class="table">
+<hr>
+
+
+<h2>
+    Usuários cadastrados
+</h2>
+
+
+<p>
+    Total de usuários:
+    <strong>{{ users_count }}</strong>
+</p>
+
+
+<table class="table table-striped table-bordered">
 
     <thead>
 
         <tr>
-            <th>Nome do usuário</th>
-            <th>Função</th>
+
+            <th>
+                ID
+            </th>
+
+            <th>
+                Usuário
+            </th>
+
+            <th>
+                Função
+            </th>
+
         </tr>
 
     </thead>
@@ -88,69 +124,22 @@
         <tr>
 
             <td>
+                {{ user.id }}
+            </td>
+
+            <td>
                 {{ user.username }}
             </td>
 
             <td>
+
                 {% if user.role %}
+
                     {{ user.role.name }}
-                {% endif %}
-            </td>
 
-        </tr>
+                {% else %}
 
-        {% endfor %}
-
-    </tbody>
-
-</table>
-
-
-<br>
-
-
-<h2>Relação de funções cadastradas</h2>
-
-<h4>Quantidade: {{ roles_count }}</h4>
-
-
-<table class="table">
-
-    <thead>
-
-        <tr>
-            <th>Funções</th>
-            <th>Usuários</th>
-        </tr>
-
-    </thead>
-
-
-    <tbody>
-
-        {% for role in roles %}
-
-        <tr>
-
-            <td>
-                {{ role.name }}
-            </td>
-
-            <td>
-
-                {% if grouped_users[role.name] %}
-
-                    <ol>
-
-                        {% for user in grouped_users[role.name] %}
-
-                        <li>
-                            {{ user.username }}
-                        </li>
-
-                        {% endfor %}
-
-                    </ol>
+                    Sem função
 
                 {% endif %}
 
@@ -163,5 +152,47 @@
     </tbody>
 
 </table>
+
+
+<hr>
+
+
+<h2>
+    Funções
+</h2>
+
+
+<p>
+    Total de funções:
+    <strong>{{ roles_count }}</strong>
+</p>
+
+
+{% for role in roles %}
+
+<h3>
+    {{ role.name }}
+</h3>
+
+
+<ul>
+
+    {% for user in grouped_users[role.name] %}
+
+    <li>
+        {{ user.username }}
+    </li>
+
+    {% else %}
+
+    <li>
+        Nenhum usuário cadastrado.
+    </li>
+
+    {% endfor %}
+
+</ul>
+
+{% endfor %}
 
 {% endblock %}

@@ -2,10 +2,13 @@
 <html lang="pt-BR">
 
 <head>
+
     <meta charset="UTF-8">
 
     <title>User Cadastrado no Banco</title>
+
 </head>
+
 
 <body style="
     margin: 0;
@@ -15,52 +18,73 @@
     color: #333333;
 ">
 
-    <div style="
-        max-width: 600px;
-        margin: 0 auto;
-        background-color: #ffffff;
-        padding: 30px;
-        border: 1px solid #dddddd;
-        border-radius: 6px;
-    ">
 
-        <h1 style="
-            margin-top: 0;
-            font-size: 28px;
-            color: #222222;
-        ">
-            User Cadastrado no Banco
-        </h1>
+<div style="
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    padding: 30px;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+">
 
-        <p style="
-            font-size: 16px;
-            color: #555555;
-        ">
-            Um novo usuário foi persistido na aplicação Flask.
-        </p>
 
-        <p style="font-size: 16px;">
-            <strong>Usuário cadastrado:</strong>
-            {{ user.username }}
-        </p>
+<h1 style="
+    margin-top: 0;
+    font-size: 28px;
+    color: #222222;
+">
 
-        <hr style="
-            border: 0;
-            border-top: 1px solid #dddddd;
-            margin: 25px 0;
-        ">
+    User Cadastrado no Banco
 
-        <p style="font-size: 16px;">
-            <strong>Prontuário:</strong>
-            {{ prontuario }}
-        </p>
+</h1>
 
-        <p style="font-size: 16px;">
-            <strong>Nome do aluno:</strong>
-            {{ aluno }}
-        </p>
 
-    </div>
+<p style="
+    font-size: 16px;
+    color: #555555;
+">
+
+    Um novo usuário foi cadastrado na aplicação Flask.
+
+</p>
+
+
+<p style="font-size: 16px;">
+
+    <strong>Usuário cadastrado:</strong>
+
+    {{ user.username }}
+
+</p>
+
+
+<hr style="
+    border: 0;
+    border-top: 1px solid #dddddd;
+    margin: 25px 0;
+">
+
+
+<p style="font-size: 16px;">
+
+    <strong>Prontuário:</strong>
+
+    {{ prontuario }}
+
+</p>
+
+
+<p style="font-size: 16px;">
+
+    <strong>Nome do aluno:</strong>
+
+    {{ aluno }}
+
+</p>
+
+
+</div>
 
 </body>
 

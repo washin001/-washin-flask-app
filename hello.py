@@ -9,7 +9,7 @@ from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_wtf import FlaskForm
 
-from wtforms import StringField, SelectField, SubmitField
+from wtforms import StringField, SelectField, SubmitField, BooleanField
 from wtforms.validators import DataRequired
 
 from flask_sqlalchemy import SQLAlchemy
@@ -125,6 +125,10 @@ class NameForm(FlaskForm):
         validators=[DataRequired()]
     )
 
+    email_admin = BooleanField(
+        'Enviar por e-mail para flaskaulasweb@zohomail.com'
+    )
+
     submit = SubmitField(
         'Submit'
     )
@@ -148,7 +152,7 @@ def make_shell_context():
 # ENVIO DE E-MAIL PELO MAILGUN
 # ============================================================
 
-def send_email(user):
+def send_email(user, enviar_admin=False):
 
     api_url = os.getenv('API_URL')
 
@@ -161,18 +165,31 @@ def send_email(user):
     student_email = os.getenv('FLASKY_STUDENT')
 
 
+    # --------------------------------------------------------
+    # DESTINATÁRIOS
+    # --------------------------------------------------------
+
     recipients = []
 
 
-    if admin_email:
-
-        recipients.append(admin_email)
-
+    # O e-mail institucional sempre recebe.
 
     if student_email:
 
         recipients.append(student_email)
 
+
+    # O e-mail do professor/admin só recebe
+    # quando o checkbox estiver marcado.
+
+    if enviar_admin and admin_email:
+
+        recipients.append(admin_email)
+
+
+    # --------------------------------------------------------
+    # VALIDAÇÕES
+    # --------------------------------------------------------
 
     if not api_url:
 
@@ -209,6 +226,10 @@ def send_email(user):
 
         return
 
+
+    # --------------------------------------------------------
+    # ENVIO
+    # --------------------------------------------------------
 
     try:
 
@@ -250,6 +271,11 @@ def send_email(user):
 
             print(
                 'E-mail enviado com sucesso.'
+            )
+
+            print(
+                'Destinatários:',
+                recipients
             )
 
         else:
@@ -306,6 +332,10 @@ def index():
     form = NameForm()
 
 
+    # --------------------------------------------------------
+    # CARREGA AS FUNÇÕES DO BANCO
+    # --------------------------------------------------------
+
     roles = Role.query.order_by(
         Role.id
     ).all()
@@ -323,9 +353,9 @@ def index():
     ]
 
 
-    # ========================================================
-    # CADASTRO DO USUÁRIO
-    # ========================================================
+    # --------------------------------------------------------
+    # CADASTRO
+    # --------------------------------------------------------
 
     if form.validate_on_submit():
 
@@ -363,10 +393,17 @@ def index():
             session['known'] = False
 
 
-            # Envia o e-mail somente quando
-            # um novo usuário é cadastrado.
+            # ------------------------------------------------
+            # ENVIO DO E-MAIL
+            # ------------------------------------------------
 
-            send_email(user)
+            send_email(
+
+                user,
+
+                enviar_admin=form.email_admin.data
+
+            )
 
 
         # ====================================================
@@ -390,9 +427,9 @@ def index():
         )
 
 
-    # ========================================================
-    # DADOS PARA A PÁGINA
-    # ========================================================
+    # --------------------------------------------------------
+    # DADOS DA PÁGINA
+    # --------------------------------------------------------
 
     users = User.query.order_by(
         User.id
