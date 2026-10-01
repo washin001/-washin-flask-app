@@ -1,7 +1,8 @@
 {% extends "bootstrap/base.html" %}
 
-{% block title %}Avaliação contínua: Aula 060.C{% endblock %}
-
+{% block title %}
+Flasky
+{% endblock %}
 
 {% block head %}
 
@@ -9,129 +10,77 @@
 
 <style>
 
-    html,
     body {
-        background-color: #181a1b;
-        color: #d0d0d0;
-    }
-
-    body {
-        font-family: Arial, Helvetica, sans-serif;
+        background-color: #121212;
+        color: #eeeeee;
     }
 
     .navbar {
-        background-color: #181a1b !important;
-        border-color: #555 !important;
-        border-radius: 0;
-        min-height: 50px;
-        margin-bottom: 30px;
+        background-color: #1f1f1f;
+        border-color: #333333;
     }
 
-    .navbar-brand {
-        color: #b8b8b8 !important;
-        font-size: 13px;
-        padding-left: 0;
-    }
-
+    .navbar-brand,
     .navbar-nav > li > a {
-        color: #b8b8b8 !important;
-        font-size: 11px;
+        color: #eeeeee !important;
     }
 
-    .navbar-nav > li > a:hover,
-    .navbar-brand:hover {
+    .navbar-brand:hover,
+    .navbar-nav > li > a:hover {
         color: #ffffff !important;
-        background-color: transparent !important;
+        background-color: #333333 !important;
     }
 
     .container {
-        max-width: 800px;
+        color: #eeeeee;
     }
 
     .page-header {
-        border-bottom: 1px solid #444;
-        margin-top: 20px;
-    }
-
-    h1,
-    h2,
-    h3 {
-        color: #c8c8c8;
-    }
-
-    h1 {
-        font-size: 24px;
-    }
-
-    h2 {
-        font-size: 20px;
-    }
-
-    h3 {
-        font-size: 14px;
-    }
-
-    p,
-    label,
-    th,
-    td,
-    li {
-        color: #c8c8c8;
+        border-bottom-color: #333333;
     }
 
     .form-control {
-        background-color: #181a1b;
-        color: #d0d0d0;
-        border: 1px solid #555;
+        background-color: #1f1f1f;
+        color: #eeeeee;
+        border-color: #555555;
     }
 
     .form-control:focus {
-        background-color: #181a1b;
+        background-color: #1f1f1f;
         color: #ffffff;
-        border-color: #777;
-        box-shadow: none;
-    }
-
-    .btn-default {
-        background-color: #181a1b;
-        color: #d0d0d0;
-        border: 1px solid #555;
-    }
-
-    .btn-default:hover {
-        background-color: #303234;
-        color: #ffffff;
-        border-color: #777;
+        border-color: #888888;
     }
 
     .table {
-        color: #c8c8c8;
-        border-color: #444;
+        color: #eeeeee;
     }
 
     .table > thead > tr > th {
-        color: #d0d0d0;
-        border-bottom: 1px solid #444;
+        border-bottom-color: #555555;
     }
 
     .table > tbody > tr > td {
-        border-top: 1px solid #444;
-        color: #c8c8c8;
+        border-top-color: #333333;
     }
 
-    .table > tbody > tr:hover {
-        background-color: #202223;
+    .table-striped > tbody > tr:nth-of-type(odd) {
+        background-color: #1a1a1a;
     }
 
-    ul,
-    ol {
-        color: #c8c8c8;
+    .btn-primary {
+        background-color: #337ab7;
+        border-color: #286090;
+    }
+
+    .alert {
+        color: #eeeeee;
+        background-color: #1f1f1f;
+        border-color: #444444;
     }
 
 </style>
 
 {% endblock %}
-
 
 {% block navbar %}
 
@@ -141,8 +90,28 @@
 
         <div class="navbar-header">
 
-            <a class="navbar-brand" href="/">
-                Avaliação contínua: Aula 060.C
+            <button
+                type="button"
+                class="navbar-toggle"
+                data-toggle="collapse"
+                data-target=".navbar-collapse"
+            >
+
+                <span class="sr-only">
+                    Toggle navigation
+                </span>
+
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+
+            </button>
+
+            <a
+                class="navbar-brand"
+                href="{{ url_for('index') }}"
+            >
+                Avaliação contínua: Aula 070
             </a>
 
         </div>
@@ -152,7 +121,19 @@
             <ul class="nav navbar-nav">
 
                 <li>
-                    <a href="/">Home</a>
+
+                    <a href="{{ url_for('index') }}">
+                        Home
+                    </a>
+
+                </li>
+
+                <li>
+
+                    <a href="{{ url_for('emails_enviados') }}">
+                        E-mails enviados
+                    </a>
+
                 </li>
 
             </ul>
@@ -165,33 +146,35 @@
 
 {% endblock %}
 
-
 {% block content %}
 
 <div class="container">
 
-    {% with messages = get_flashed_messages() %}
+    {% for message in get_flashed_messages() %}
 
-        {% if messages %}
+        <div class="alert alert-warning">
 
-            {% for message in messages %}
+            <button
+                type="button"
+                class="close"
+                data-dismiss="alert"
+            >
+                &times;
+            </button>
 
-                <div class="alert alert-warning">
-                    {{ message }}
-                </div>
+            {{ message }}
 
-            {% endfor %}
+        </div>
 
-        {% endif %}
+    {% endfor %}
 
-    {% endwith %}
+    {% block page_content %}
 
-    {% block page_content %}{% endblock %}
+    {% endblock %}
 
 </div>
 
 {% endblock %}
-
 
 {% block scripts %}
 

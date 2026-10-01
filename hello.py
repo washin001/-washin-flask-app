@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import requests
 from dotenv import load_dotenv
@@ -9,16 +11,12 @@ from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_wtf import FlaskForm
 
-from wtforms import StringField, SelectField, SubmitField, BooleanField
+from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-
-# ============================================================
-# CONFIGURAÇÕES
-# ============================================================
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -37,9 +35,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = \
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
-# ============================================================
-# EXTENSÕES
-# ============================================================
+SAO_PAULO = ZoneInfo('America/Sao_Paulo')
+
+
+def agora():
+    return datetime.now(SAO_PAULO)
+
 
 bootstrap = Bootstrap(app)
 
@@ -49,39 +50,6 @@ db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
 
-
-# ============================================================
-# MODELO ROLE
-# ============================================================
-
-class Role(db.Model):
-
-    __tablename__ = 'roles'
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-
-    name = db.Column(
-        db.String(64),
-        unique=True
-    )
-
-    users = db.relationship(
-        'User',
-        backref='role',
-        lazy='dynamic'
-    )
-
-    def __repr__(self):
-
-        return '<Role %r>' % self.name
-
-
-# ============================================================
-# MODELO USER
-# ============================================================
 
 class User(db.Model):
 
@@ -98,35 +66,60 @@ class User(db.Model):
         index=True
     )
 
-    role_id = db.Column(
-        db.Integer,
-        db.ForeignKey('roles.id')
-    )
-
     def __repr__(self):
 
         return '<User %r>' % self.username
 
 
-# ============================================================
-# FORMULÁRIO
-# ============================================================
+class EmailSent(db.Model):
+
+    __tablename__ = 'emails_sent'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    sender = db.Column(
+        db.String(128),
+        nullable=False
+    )
+
+    recipient = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    subject = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    text = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    sent_at = db.Column(
+        db.DateTime,
+        default=agora,
+        nullable=False
+    )
+
+    def __repr__(self):
+
+        return '<EmailSent %r>' % self.subject
+
 
 class NameForm(FlaskForm):
 
     name = StringField(
-        'What is your name?',
-        validators=[DataRequired()]
-    )
-
-    role = SelectField(
-        'Role?',
-        coerce=int,
+        'Qual é o seu nome?',
         validators=[DataRequired()]
     )
 
     email_admin = BooleanField(
-        'Enviar por e-mail para flaskaulasweb@zohomail.com'
+        'Deseja enviar e-mail para flaskaulasweb@zohomail.com?'
     )
 
     submit = SubmitField(
@@ -134,23 +127,15 @@ class NameForm(FlaskForm):
     )
 
 
-# ============================================================
-# CONTEXTO DO FLASK SHELL
-# ============================================================
-
 @app.shell_context_processor
 def make_shell_context():
 
     return dict(
         db=db,
         User=User,
-        Role=Role
+        EmailSent=EmailSent
     )
 
-
-# ============================================================
-# ENVIO DE E-MAIL PELO MAILGUN
-# ============================================================
 
 def send_email(user, enviar_admin=False):
 
@@ -165,71 +150,62 @@ def send_email(user, enviar_admin=False):
     student_email = os.getenv('FLASKY_STUDENT')
 
 
-    # --------------------------------------------------------
-    # DESTINATÁRIOS
-    # --------------------------------------------------------
-
     recipients = []
 
-
-    # O e-mail institucional sempre recebe.
 
     if student_email:
 
         recipients.append(student_email)
 
 
-    # O e-mail do professor/admin só recebe
-    # quando o checkbox estiver marcado.
-
     if enviar_admin and admin_email:
 
         recipients.append(admin_email)
 
 
-    # --------------------------------------------------------
-    # VALIDAÇÕES
-    # --------------------------------------------------------
-
     if not api_url:
 
-        print(
-            'ERRO: API_URL não configurada.'
-        )
+        print('ERRO: API_URL não configurada.')
 
-        return
+        return False
 
 
     if not api_key:
 
-        print(
-            'ERRO: API_KEY não configurada.'
-        )
+        print('ERRO: API_KEY não configurada.')
 
-        return
+        return False
 
 
     if not api_from:
 
-        print(
-            'ERRO: API_FROM não configurada.'
-        )
+        print('ERRO: API_FROM não configurada.')
 
-        return
+        return False
 
 
     if not recipients:
 
-        print(
-            'ERRO: nenhum destinatário configurado.'
-        )
+        print('ERRO: nenhum destinatário configurado.')
 
-        return
+        return False
 
 
-    # --------------------------------------------------------
-    # ENVIO
-    # --------------------------------------------------------
+    subject = '[Flask] Novo usuário'
+
+
+    email_text = (
+        'Novo usuário cadastrado: '
+        + user.username
+        + '\n\n'
+        + 'Prontuário: PT303755X'
+        + '\n'
+        + 'Nome do aluno: WASHINGTON SOUSA'
+        + '\n'
+        + 'Usuário cadastrado: '
+        + user.username
+    )
+
 
     try:
 
@@ -248,8 +224,7 @@ def send_email(user, enviar_admin=False):
 
                 'to': recipients,
 
-                'subject':
-                    '[Flask] User Cadastrado no Banco',
+                'subject': subject,
 
                 'html': render_template(
 
@@ -260,7 +235,9 @@ def send_email(user, enviar_admin=False):
                     prontuario='PT303755X',
 
                     aluno='WASHINGTON SOUSA'
+
                 )
+
             },
 
             timeout=30
@@ -269,14 +246,42 @@ def send_email(user, enviar_admin=False):
 
         if response.ok:
 
-            print(
-                'E-mail enviado com sucesso.'
-            )
+            print('E-mail enviado com sucesso.')
 
             print(
                 'Destinatários:',
                 recipients
             )
+
+
+            email_sent = EmailSent(
+
+                sender='WASHINGTON SOUSA',
+
+                recipient=', '.join(
+                    recipients
+                ),
+
+                subject=subject,
+
+                text=email_text,
+
+                sent_at=agora()
+
+            )
+
+
+            db.session.add(email_sent)
+
+            db.session.commit()
+
+
+            print(
+                'E-mail registrado no banco de dados.'
+            )
+
+            return True
+
 
         else:
 
@@ -286,6 +291,8 @@ def send_email(user, enviar_admin=False):
                 response.text
             )
 
+            return False
+
 
     except Exception as e:
 
@@ -294,10 +301,8 @@ def send_email(user, enviar_admin=False):
             e
         )
 
+        return False
 
-# ============================================================
-# ERRO 404
-# ============================================================
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -307,10 +312,6 @@ def page_not_found(e):
     ), 404
 
 
-# ============================================================
-# ERRO 500
-# ============================================================
-
 @app.errorhandler(500)
 def internal_server_error(e):
 
@@ -318,10 +319,6 @@ def internal_server_error(e):
         '500.html'
     ), 500
 
-
-# ============================================================
-# HOME
-# ============================================================
 
 @app.route(
     '/',
@@ -332,31 +329,6 @@ def index():
     form = NameForm()
 
 
-    # --------------------------------------------------------
-    # CARREGA AS FUNÇÕES DO BANCO
-    # --------------------------------------------------------
-
-    roles = Role.query.order_by(
-        Role.id
-    ).all()
-
-
-    form.role.choices = [
-
-        (
-            role.id,
-            role.name
-        )
-
-        for role in roles
-
-    ]
-
-
-    # --------------------------------------------------------
-    # CADASTRO
-    # --------------------------------------------------------
-
     if form.validate_on_submit():
 
         user = User.query.filter_by(
@@ -364,38 +336,18 @@ def index():
         ).first()
 
 
-        selected_role = db.session.get(
-            Role,
-            form.role.data
-        )
-
-
-        # ====================================================
-        # NOVO USUÁRIO
-        # ====================================================
-
         if user is None:
 
             user = User(
-
-                username=form.name.data,
-
-                role=selected_role
-
+                username=form.name.data
             )
-
 
             db.session.add(user)
 
             db.session.commit()
 
-
             session['known'] = False
 
-
-            # ------------------------------------------------
-            # ENVIO DO E-MAIL
-            # ------------------------------------------------
 
             send_email(
 
@@ -406,15 +358,7 @@ def index():
             )
 
 
-        # ====================================================
-        # USUÁRIO JÁ EXISTENTE
-        # ====================================================
-
         else:
-
-            user.role = selected_role
-
-            db.session.commit()
 
             session['known'] = True
 
@@ -427,37 +371,12 @@ def index():
         )
 
 
-    # --------------------------------------------------------
-    # DADOS DA PÁGINA
-    # --------------------------------------------------------
-
     users = User.query.order_by(
         User.id
     ).all()
 
 
     users_count = User.query.count()
-
-
-    roles_count = Role.query.count()
-
-
-    grouped_users = {}
-
-
-    for role in roles:
-
-        grouped_users[role.name] = (
-
-            role.users
-
-            .order_by(
-                User.username
-            )
-
-            .all()
-
-        )
 
 
     return render_template(
@@ -475,12 +394,25 @@ def index():
 
         users=users,
 
-        roles=roles,
+        users_count=users_count
 
-        grouped_users=grouped_users,
+    )
 
-        users_count=users_count,
 
-        roles_count=roles_count
+@app.route(
+    '/emailsEnviados'
+)
+def emails_enviados():
+
+    emails = EmailSent.query.order_by(
+        EmailSent.sent_at.desc()
+    ).all()
+
+
+    return render_template(
+
+        'emailsEnviados.html',
+
+        emails=emails
 
     )
