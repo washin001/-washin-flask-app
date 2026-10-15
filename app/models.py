@@ -1,0 +1,49 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+from . import db
+
+
+SAO_PAULO = ZoneInfo('America/Sao_Paulo')
+
+
+def sao_paulo_now():
+    return datetime.now(SAO_PAULO)
+
+
+class User(db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    username = db.Column(
+        db.String(64),
+        unique=True,
+        index=True
+    )
+
+    def __repr__(self):
+        return '<User %r>' % self.username
+
+
+class EmailSent(db.Model):
+    __tablename__ = 'emails_sent'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    sender = db.Column(db.String(128), nullable=False)
+
+    recipient = db.Column(db.Text, nullable=False)
+
+    subject = db.Column(db.String(255), nullable=False)
+
+    text = db.Column(db.Text, nullable=False)
+
+    sent_at = db.Column(
+        db.DateTime,
+        default=sao_paulo_now,
+        nullable=False
+    )
+
+    def __repr__(self):
+        return '<EmailSent %r>' % self.subject
