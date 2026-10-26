@@ -5,7 +5,7 @@ import unittest
 from flask_migrate import Migrate
 
 from app import create_app, db
-from app.models import User, EmailSent
+from app.models import User, Role, EmailSent
 
 
 app = create_app(
@@ -17,9 +17,11 @@ migrate = Migrate(app, db)
 
 @app.shell_context_processor
 def make_shell_context():
+
     return dict(
         db=db,
         User=User,
+        Role=Role,
         EmailSent=EmailSent
     )
 
@@ -27,13 +29,17 @@ def make_shell_context():
 @app.cli.command()
 @click.argument('test_names', nargs=-1)
 def test(test_names):
+
     """Executa os testes de unidade."""
 
     if test_names:
+
         tests = unittest.TestLoader().loadTestsFromNames(
             test_names
         )
+
     else:
+
         tests = unittest.TestLoader().discover('tests')
 
     result = unittest.TextTestRunner(
@@ -41,6 +47,7 @@ def test(test_names):
     ).run(tests)
 
     if not result.wasSuccessful():
+
         raise click.ClickException(
             'Um ou mais testes falharam.'
         )
